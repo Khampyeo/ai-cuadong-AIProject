@@ -30,39 +30,38 @@ jobs:
     - name: Build Docker image
       run: docker build -t fe-app:latest .
 
-    # Step 4: Deploy Docker Image to Azure VM
-    deploy:
-      runs-on: ubuntu-latest
+  deploy:
+    runs-on: ubuntu-latest
 
-      steps:
-      - name: Checkout code again
-        uses: actions/checkout@v3
+    steps:
+    - name: Checkout code again
+      uses: actions/checkout@v3
 
-      # Step 5: Deploy to Azure VM using SSH and Docker
-      - name: SSH and deploy to Azure VM
-        uses: appleboy/ssh-action@v0.1.4
-        with:
-          host: ${{ secrets.AZURE_VM_IP }}
-          username: ${{ secrets.AZURE_VM_USERNAME }}
-          key: ${{ secrets.AZURE_VM_SSH_KEY }}
-          port: 22
-          script: |
-            # Clean up old container if exists
-            docker stop fe-app || true
-            docker rm fe-app || true
-            docker rmi fe-app:latest || true
+    # Step 4: Deploy to Azure VM using SSH and Docker
+    - name: SSH and deploy to Azure VM
+      uses: appleboy/ssh-action@v0.1.4
+      with:
+        host: ${{ secrets.AZURE_VM_IP }}
+        username: ${{ secrets.AZURE_VM_USERNAME }}
+        key: ${{ secrets.AZURE_VM_SSH_KEY }}
+        port: 22
+        script: |
+          # Clean up old container if exists
+          docker stop fe-app || true
+          docker rm fe-app || true
+          docker rmi fe-app:latest || true
 
-            # Create directory if not exists
-            mkdir -p /home/azureuser/app
+          # Create directory if not exists
+          mkdir -p /home/azureuser/app
 
-            # Copy all necessary files (Dockerfile and application files) from GitHub to VM
-            scp -r * azureuser@${{ secrets.AZURE_VM_IP }}:/home/azureuser/app/
+          # Copy all necessary files (Dockerfile and application files) from GitHub to VM
+          scp -r * azureuser@${{ secrets.AZURE_VM_IP }}:/home/azureuser/app/
 
-            # Navigate to app directory
-            cd /home/azureuser/app
+          # Navigate to app directory
+          cd /home/azureuser/app
 
-            # Build the Docker image on the VM
-            docker build -t fe-app:latest .
+          # Build the Docker image on the VM
+          docker build -t fe-app:latest .
 
-            # Run the new container
-            docker run -d -p 80:80 --name fe-app fe-app:latest
+          # Run the new container
+          docker run -d -p 80:80 --name fe-app fe-app:latest
