@@ -37,7 +37,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     rememberMe: boolean,
     redirect?: string | null
   ) => {
-    console.log(123);
     setIsFetching(true);
     setErrorMessage(null);
     try {
@@ -47,10 +46,11 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         rememberMe,
       });
       if (response.result === "success") {
+        setIsAuthenticated(true);
         if (redirect) {
           router.push(redirect);
         } else {
-          router.push("/chat");
+          router.push("/");
         }
       } else {
         setErrorMessage("Authentication Failed");

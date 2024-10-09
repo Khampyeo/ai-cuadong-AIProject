@@ -38,14 +38,14 @@ const LoginForm: React.FC = () => {
   return (
     <Form
       form={form}
-      className="bg-white w-[25rem] !p-8 flex flex-col items-center shadow-lg rounded-lg"
+      className="bg-background-secondary border dark:border-border w-[25rem] !p-8 flex flex-col items-center shadow-lg rounded-lg"
       layout="vertical"
     >
       <h1 className="text-[2rem] leading-8 font-bold">Welcome!</h1>
 
       <Divider className="!mb-0" />
       <div className="relative mt-4 w-full">
-        <p className="my-2 mx-0 font-semibold">Email</p>
+        <p className="my-2 mx-0 font-medium">Email</p>
         <Form.Item
           name="account"
           rules={[
@@ -69,7 +69,7 @@ const LoginForm: React.FC = () => {
             }}
           />
         </Form.Item>
-        <p className="my-2 mx-0 font-semibold">Password</p>
+        <p className="my-2 mx-0 font-medium">Password</p>
         <Form.Item
           name="password"
           rules={[
@@ -101,7 +101,7 @@ const LoginForm: React.FC = () => {
           <Form.Item
             name="remember"
             valuePropName="checked"
-            className="font-medium m-0"
+            className="font-medium !m-0"
           >
             <Checkbox defaultChecked={false}>Remember me</Checkbox>
           </Form.Item>
@@ -114,14 +114,14 @@ const LoginForm: React.FC = () => {
         <Flex
           justify="center"
           align="center"
-          className="mt-4 h-12 bg-[#feebe8] w-full text-red-600 font-semibold p-4 border border-red-600"
+          className="mt-4 h-12 bg-red-200 dark:bg-red-400 w-full text-red-600 dark:text-red-950 font-medium p-4 border border-red-600"
         >
           {errorMessage}
         </Flex>
       )}
       <Button
         size="large"
-        className="mt-4 w-full"
+        className="mt-8 w-full"
         type="primary"
         onClick={() => login()}
         loading={isFetching}

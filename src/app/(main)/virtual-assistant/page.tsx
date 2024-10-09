@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Flex, Input, message } from "antd";
+import { Button, Flex, message } from "antd";
 import useSpeechToText from "@/hooks/useSpeechToText";
 import useAvatar from "@/hooks/useVirtualAssistant";
 import Microphone from "./components/Microphone";
@@ -44,8 +44,8 @@ const GeneraticAi = () => {
   }, [browserSupportsSpeechRecognition]);
 
   return (
-    <div>
-      <Flex gap={8} justify="center" className="mt-5">
+    <div className="pt-4">
+      <Flex gap={8} justify="center">
         <div className="relative flex items-center flex-col text-text-primary">
           <div className="">
             <VirtualVideo
@@ -98,26 +98,19 @@ const GeneraticAi = () => {
           )}
         </div>
       </Flex>
-      <Flex gap={16} className="px-12 mt-8">
-        <Input
-          onChange={(e) => {
-            setText(e.target.value);
-          }}
-        ></Input>
-        <Button
-          onClick={() => {
-            sendMessage({
-              pc_id: pcId!,
-              input_text: text,
-              use_gpt: "true",
-              conversation_histories: [],
-              request_type: "question",
-            });
-          }}
-        >
-          Send message
-        </Button>
-      </Flex>
+      <Button
+        onClick={() => {
+          sendMessage({
+            pc_id: pcId!,
+            input_text: "avs",
+            use_gpt: "true",
+            conversation_histories: [],
+            request_type: "question",
+          });
+        }}
+      >
+        Send message
+      </Button>
     </div>
   );
 };
