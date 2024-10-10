@@ -3,7 +3,11 @@ import { Flex, Select } from "antd";
 
 export default function PageNotFound() {
   return (
-    <Flex justify="center" align="center" className="h-dvh w-screen">
+    <Flex
+      justify="center"
+      align="center"
+      className="h-dvh w-screen bg-background-primary"
+    >
       <Flex align="center" gap={40} vertical className="p-10">
         <h1 className="font-bold text-7xl">404</h1>
         <h2 className="text-2xl">Sorry, we were unable to find that page</h2>

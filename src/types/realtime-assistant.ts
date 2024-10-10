@@ -9,5 +9,4 @@ export type MessagePayload = {
 export type Message = {
   actor: "user" | "bot";
   message: string;
-  sessionId: string;
 };

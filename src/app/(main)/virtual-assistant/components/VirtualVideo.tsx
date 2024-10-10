@@ -20,7 +20,7 @@ const VirtualVideo = ({
   return (
     <>
       <Flex justify="space-between">
-        <Flex gap={10}>
+        <Flex gap={8}>
           <Button
             onClick={() => startSession()}
             loading={isLoading}
@@ -33,7 +33,7 @@ const VirtualVideo = ({
           </Button>
         </Flex>
       </Flex>
-      <div className="xl:w-[30rem] xl:h-[30rem] w-[25rem] h-[25rem] overflow-hidden rounded-full bg-black ">
+      <div className="xl:w-[30rem] xl:h-[30rem] w-[25rem] h-[25rem] overflow-hidden rounded-full bg-black mt-4">
         <video
           id="video"
           className="-translate-y-10"

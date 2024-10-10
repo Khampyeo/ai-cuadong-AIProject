@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { Button, Flex, message } from "antd";
 import useSpeechToText from "@/hooks/useSpeechToText";
 import useAvatar from "@/hooks/useVirtualAssistant";
+import { Message } from "@/types/realtime-assistant";
 import Microphone from "./components/Microphone";
 import Subtitle from "./components/Subtitle";
 import VirtualVideo from "./components/VirtualVideo";
@@ -29,14 +30,17 @@ const GeneraticAi = () => {
     browserSupportsSpeechRecognition,
   } = useSpeechToText();
 
-  const [text, setText] = useState("");
-  useEffect(() => {
-    setText(transcript);
-  }, [transcript]);
+  const [conversation, setConversation] = useState<Message[]>([]);
 
   useEffect(() => {
-    setText(messageReceived);
+    const newConversation = [...conversation];
+    newConversation.push({
+      message: messageReceived,
+      actor: "user",
+    });
+    setConversation(newConversation);
   }, [messageReceived]);
+  console.log(conversation);
 
   useEffect(() => {
     if (!browserSupportsSpeechRecognition)
@@ -45,7 +49,7 @@ const GeneraticAi = () => {
 
   return (
     <div className="pt-4">
-      <Flex gap={8} justify="center">
+      <Flex gap={16} justify="center">
         <div className="relative flex items-center flex-col text-text-primary">
           <div className="">
             <VirtualVideo
@@ -92,25 +96,22 @@ const GeneraticAi = () => {
             Subtitle
           </Button>
           {isSubtitle && (
-            <div className="mt-5">
-              <Subtitle transcript={text} />
+            <div className="mt-4">
+              <Subtitle
+                sendMessage={(text: string) =>
+                  sendMessage({
+                    pc_id: pcId!,
+                    input_text: text,
+                    use_gpt: "true",
+                    conversation_histories: [],
+                    request_type: "question",
+                  })
+                }
+              />
             </div>
           )}
         </div>
       </Flex>
-      <Button
-        onClick={() => {
-          sendMessage({
-            pc_id: pcId!,
-            input_text: "avs",
-            use_gpt: "true",
-            conversation_histories: [],
-            request_type: "question",
-          });
-        }}
-      >
-        Send message
-      </Button>
     </div>
   );
 };
