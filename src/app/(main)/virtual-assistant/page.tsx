@@ -15,6 +15,7 @@ const GeneraticAi = () => {
     startSession,
     stopSession,
     isLoading,
+    isProcessing,
     isOpen,
     myAvatarVideoEleRef,
     pcId,
@@ -77,7 +78,14 @@ const GeneraticAi = () => {
                     conversation_histories: [],
                     request_type: "question",
                   });
+                  const newConversation = [...conversation];
+                  newConversation.push({
+                    message: transcript,
+                    actor: "user",
+                  });
+                  setConversation(newConversation);
                 }
+
                 stopListening();
                 setTimeout(() => {
                   resetTranscript();
@@ -99,6 +107,10 @@ const GeneraticAi = () => {
             <div className="mt-4">
               <Subtitle
                 conversation={conversation}
+                isProcessing={isProcessing}
+                isStartVirtual={isOpen}
+                listening={listening}
+                transcript={transcript}
                 sendMessage={(text: string) => {
                   sendMessage({
                     pc_id: pcId!,
@@ -110,7 +122,7 @@ const GeneraticAi = () => {
                   const newConversation = [...conversation];
                   newConversation.push({
                     message: text,
-                    actor: "bot",
+                    actor: "user",
                   });
                   setConversation(newConversation);
                 }}

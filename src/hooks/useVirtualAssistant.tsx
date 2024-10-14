@@ -27,6 +27,7 @@ const useVirtualAssistant = () => {
   const pc: MutableRefObject<RTCPeerConnectionType> = useRef(null);
   const dc: MutableRefObject<RTCDataChannelType> = useRef(null);
   const [isLoading, setIsLoading] = useState<boolean>(false);
+  const [isProcessing, setIsProcessing] = useState<boolean>(false);
   const [isOpen, setIsOpen] = useState<boolean>(false);
   const [pcId, setPcId] = useState<string | null>(null);
   const [messageReceived, setMessageReceived] = useState<string>("");
@@ -64,22 +65,17 @@ const useVirtualAssistant = () => {
     dc.current = pc.current?.createDataChannel("chat");
 
     dc.current.addEventListener("open", () => {
-      console.log("open");
-
       setIsLoading(false);
       setIsOpen(true);
     });
     dc.current.addEventListener("message", (event) => {
-      console.log(event);
-
+      setIsProcessing(false);
       const data = JSON.parse(event.data);
       if (data.status === "Start") {
         setMessageReceived(data.text_answer);
       }
     });
     dc.current.addEventListener("close", () => {
-      console.log("close");
-
       setIsLoading(false);
       setIsOpen(false);
       setPcId(null);
@@ -139,6 +135,7 @@ const useVirtualAssistant = () => {
     }
   };
   const sendMessage = (message: MessagePayload) => {
+    setIsProcessing(true);
     dc.current?.send(JSON.stringify(message));
   };
   const stopSession = () => {
@@ -166,6 +163,7 @@ const useVirtualAssistant = () => {
     startSession,
     stopSession,
     isLoading,
+    isProcessing,
     myAvatarVideoEleRef,
     sendMessage,
     pcId,
