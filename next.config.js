@@ -1,11 +1,5 @@
 module.exports = {
   reactStrictMode: false,
-  rewrites: () => [
-    {
-      source: "/api/:path*",
-      destination: process.env.REACT_APP_STREAM_BASE_URL + "/:path*",
-    },
-  ],
   env: {
     ICE_SERVER_URL: process.env.ICE_SERVER_URL,
     ICE_SERVER_USERNAME: process.env.ICE_SERVER_USERNAME,

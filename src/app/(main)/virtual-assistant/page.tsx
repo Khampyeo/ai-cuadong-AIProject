@@ -10,7 +10,7 @@ import Subtitle from "./components/Subtitle";
 import VirtualVideo from "./components/VirtualVideo";
 
 const GeneraticAi = () => {
-  const [isSubtitle, setIsSubtitle] = useState(false);
+  const [isSubtitle, setIsSubtitle] = useState(true);
   const {
     startSession,
     stopSession,
@@ -33,14 +33,14 @@ const GeneraticAi = () => {
   const [conversation, setConversation] = useState<Message[]>([]);
 
   useEffect(() => {
+    if (!messageReceived) return;
     const newConversation = [...conversation];
     newConversation.push({
       message: messageReceived,
-      actor: "user",
+      actor: "bot",
     });
     setConversation(newConversation);
   }, [messageReceived]);
-  console.log(conversation);
 
   useEffect(() => {
     if (!browserSupportsSpeechRecognition)
@@ -98,15 +98,22 @@ const GeneraticAi = () => {
           {isSubtitle && (
             <div className="mt-4">
               <Subtitle
-                sendMessage={(text: string) =>
+                conversation={conversation}
+                sendMessage={(text: string) => {
                   sendMessage({
                     pc_id: pcId!,
                     input_text: text,
                     use_gpt: "true",
                     conversation_histories: [],
                     request_type: "question",
-                  })
-                }
+                  });
+                  const newConversation = [...conversation];
+                  newConversation.push({
+                    message: text,
+                    actor: "bot",
+                  });
+                  setConversation(newConversation);
+                }}
               />
             </div>
           )}

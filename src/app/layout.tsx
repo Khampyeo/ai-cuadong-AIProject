@@ -1,10 +1,11 @@
-"use client"
+"use client";
+
+import { useEffect } from "react";
+import { Roboto } from "next/font/google";
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { App, ConfigProvider, theme } from "antd";
 import { useDarkModeStore } from "@/store/darkmodeStore";
-import { useEffect } from "react";
 import { ClientProviders } from "./components/ClientProviders";
-import { Roboto } from "next/font/google";
 import Loader from "./components/loader/Loader";
 import "./globals.css";
 import "regenerator-runtime/runtime";
@@ -38,7 +39,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-      <AntdRegistry>
+        <AntdRegistry>
           <App>
             <ClientProviders>
               <ConfigProvider

@@ -13,11 +13,10 @@ const MainLayout = ({
 }>) => {
   const router = useRouter();
   const path = usePathname();
-  const { isAuthenticated } = useAuth();
+  // const { isAuthenticated } = useAuth();
+  const isAuthenticated = true;
 
   useEffect(() => {
-    console.log(1);
-
     if (!isAuthenticated) {
       router.replace("/login?redirect=" + path);
     }
