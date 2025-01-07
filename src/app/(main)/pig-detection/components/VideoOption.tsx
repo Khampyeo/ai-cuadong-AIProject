@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
 import {
   CaretRightOutlined,
@@ -66,7 +67,7 @@ const VideoOption = () => {
       message.success("Image processed successfully!");
       getVideoProcessed.mutate(response.result_path.replace("results/", ""));
     },
-    onError: (error) => {
+    onError: () => {
       message.error("Failed to process image.");
     },
   });

@@ -13,8 +13,6 @@ type Props = {
   conversation: Message[];
   isProcessing: boolean;
   isStartVirtual: boolean;
-  transcript: string;
-  listening: boolean;
 };
 
 const Subtitle = ({
@@ -22,8 +20,6 @@ const Subtitle = ({
   conversation,
   isProcessing,
   isStartVirtual,
-  transcript,
-  listening,
 }: Props) => {
   const bottomRef = useRef<HTMLDivElement | null>(null);
   const inputRef = useRef<InputRef | null>(null);
@@ -44,11 +40,6 @@ const Subtitle = ({
       inputElement.scrollLeft = inputElement.scrollWidth;
     }
   }, [text]);
-
-  useEffect(() => {
-    if (listening) setText(transcript);
-    else setText("");
-  }, [transcript]);
 
   return (
     <div className="relative xl:w-[25rem] w-[20rem] rounded-lg xl:h-[30rem] h-[25rem] p-3 overflow-y-auto bg-black/5 dark:bg-white/10 border border-border">
@@ -71,9 +62,6 @@ const Subtitle = ({
         >
           <Input
             ref={inputRef}
-            onChange={(e) => {
-              if (!listening) setText(e.target.value);
-            }}
             onKeyDown={(e) => {
               if (e.key === "Enter") handleSendMessage(text);
             }}

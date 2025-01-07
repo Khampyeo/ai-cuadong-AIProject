@@ -1,8 +1,9 @@
-import { headers } from "next/headers";
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { fetchApi } from "@/configs/fetchApi";
 
 const URL =
   "https://8c51-2405-4802-8146-8480-ffff-ffff-ffff-fff9.ngrok-free.app";
+
 export const processImage = (file: any) => {
   const formData = new FormData();
   formData.append("file", file);

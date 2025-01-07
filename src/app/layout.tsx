@@ -8,7 +8,6 @@ import { useDarkModeStore } from "@/store/darkmodeStore";
 import { ClientProviders } from "./components/ClientProviders";
 import Loader from "./components/loader/Loader";
 import "./globals.css";
-import "regenerator-runtime/runtime";
 
 const roboto = Roboto({
   weight: ["300", "400", "500"],

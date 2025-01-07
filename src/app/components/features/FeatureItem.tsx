@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useRouter } from "next/navigation";
 import { Flex } from "antd";
 import ArrowIcon from "@/../public/icons/icon_arrow__up-right.svg";

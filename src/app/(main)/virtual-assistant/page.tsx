@@ -1,11 +1,9 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { Button, Flex, message } from "antd";
-import useSpeechToText from "@/hooks/useSpeechToText";
+import { Button, Flex } from "antd";
 import useAvatar from "@/hooks/useVirtualAssistant";
 import { Message } from "@/types/realtime-assistant";
-import Microphone from "./components/Microphone";
 import Subtitle from "./components/Subtitle";
 import VirtualVideo from "./components/VirtualVideo";
 
@@ -22,14 +20,6 @@ const GeneraticAi = () => {
     sendMessage,
     messageReceived,
   } = useAvatar();
-  const {
-    transcript,
-    listening,
-    startListening,
-    stopListening,
-    resetTranscript,
-    browserSupportsSpeechRecognition,
-  } = useSpeechToText();
 
   const [conversation, setConversation] = useState<Message[]>([]);
 
@@ -43,11 +33,6 @@ const GeneraticAi = () => {
     setConversation(newConversation);
   }, [messageReceived]);
 
-  useEffect(() => {
-    if (!browserSupportsSpeechRecognition)
-      message.error("Browser not support speech recognition!");
-  }, [browserSupportsSpeechRecognition]);
-
   return (
     <div className="pt-4">
       <Flex gap={16} justify="center">
@@ -59,42 +44,11 @@ const GeneraticAi = () => {
               startSession={startSession}
               stopSession={() => {
                 stopSession();
-                stopListening();
               }}
               myAvatarVideoEleRef={myAvatarVideoEleRef}
             />
           </div>
-          <div className="mt-5">
-            <Microphone
-              start={() => {
-                startListening();
-              }}
-              stop={() => {
-                if (transcript) {
-                  sendMessage({
-                    pc_id: pcId!,
-                    input_text: transcript,
-                    use_gpt: "true",
-                    conversation_histories: [],
-                    request_type: "question",
-                  });
-                  const newConversation = [...conversation];
-                  newConversation.push({
-                    message: transcript,
-                    actor: "user",
-                  });
-                  setConversation(newConversation);
-                }
-
-                stopListening();
-                setTimeout(() => {
-                  resetTranscript();
-                }, 1000);
-              }}
-              isListening={listening}
-              isStartVirtual={isOpen}
-            />
-          </div>
+          <div className="mt-5"></div>
         </div>
         <div className="">
           <Button
@@ -109,8 +63,6 @@ const GeneraticAi = () => {
                 conversation={conversation}
                 isProcessing={isProcessing}
                 isStartVirtual={isOpen}
-                listening={listening}
-                transcript={transcript}
                 sendMessage={(text: string) => {
                   sendMessage({
                     pc_id: pcId!,

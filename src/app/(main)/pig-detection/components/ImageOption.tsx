@@ -1,5 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { useState } from "react";
-import { headers } from "next/headers";
 import {
   CaretRightOutlined,
   DownloadOutlined,
@@ -66,7 +66,7 @@ const ImageOption = () => {
       setMessageImageProcessed(response.message);
       getImageProcessed.mutate(response.result_path.replace("results/", ""));
     },
-    onError: (error) => {
+    onError: () => {
       message.error("Failed to process image.");
     },
   });
