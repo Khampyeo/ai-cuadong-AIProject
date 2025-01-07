@@ -13,8 +13,7 @@ const MainLayout = ({
 }>) => {
   const router = useRouter();
   const path = usePathname();
-  // const { isAuthenticated } = useAuth();
-  const isAuthenticated = true;
+  const { isAuthenticated } = useAuth();
 
   useEffect(() => {
     if (!isAuthenticated) {

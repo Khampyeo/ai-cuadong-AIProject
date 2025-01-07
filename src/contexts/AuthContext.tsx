@@ -1,7 +1,13 @@
 "use client";
 
-import { createContext, ReactNode, useContext, useState } from "react";
-import { useRouter } from "next/navigation";
+import {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+import { usePathname, useRouter } from "next/navigation";
 import { login, logout } from "@/apis/authenticate.api";
 
 interface AuthContextProps {
@@ -30,6 +36,19 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isFetching, setIsFetching] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const pathname = usePathname();
+
+  useEffect(() => {
+    const token = localStorage.getItem("ai-cuadong");
+    if (token === "@Abc123") {
+      setIsAuthenticated(true);
+    }
+  }, []);
+  useEffect(() => {
+    if (isAuthenticated && pathname === "/login") {
+      router.push("/");
+    }
+  }, [isAuthenticated, pathname, router]);
 
   const handleLogin = async (
     email: string,
@@ -47,6 +66,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       });
       if (response.result === "success") {
         setIsAuthenticated(true);
+        localStorage.setItem("ai-cuadong", "@Abc123");
         if (redirect) {
           router.push(redirect);
         } else {
@@ -65,6 +85,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const handleLogout = async () => {
     await logout();
     setIsAuthenticated(false);
+    localStorage.removeItem("ai-cuadong");
     router.push("/login");
   };
 
