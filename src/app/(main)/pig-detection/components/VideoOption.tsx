@@ -48,8 +48,7 @@ const VideoOption = () => {
       return getFile(name);
     },
     onSuccess: async (response: any) => {
-      const blob = await response.blob();
-      const url = URL.createObjectURL(blob);
+      const url = URL.createObjectURL(response.data);
       setVideoProcessed(url);
       message.success("Processed video fetched successfully!");
     },

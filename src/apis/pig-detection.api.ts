@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import axios from "axios";
 import { fetchApi } from "@/configs/fetchApi";
 
 const URL =
@@ -23,12 +24,13 @@ export const processVideo = (file: any) => {
   );
 };
 export const getFile = (filename: string) => {
-  return fetch(
+  return axios.get(
     `https://8c51-2405-4802-8146-8480-ffff-ffff-ffff-fff9.ngrok-free.app/api/v1/results/${filename}`,
     {
-      method: "GET",
+      responseType: "blob",
       headers: {
         "User-Agent": "",
+        "ngrok-skip-browser-warning": "69420",
       },
     }
   );
