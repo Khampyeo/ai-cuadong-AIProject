@@ -3,7 +3,7 @@ import axios from "axios";
 import { fetchApi } from "@/configs/fetchApi";
 
 const URL =
-  "https://8c51-2405-4802-8146-8480-ffff-ffff-ffff-fff9.ngrok-free.app";
+  "https://7a3d-2405-4802-8146-8480-ffff-ffff-ffff-fff9.ngrok-free.app";
 
 export const processImage = (file: any) => {
   const formData = new FormData();
@@ -25,7 +25,7 @@ export const processVideo = (file: any) => {
 };
 export const getFile = (filename: string) => {
   return axios.get(
-    `https://8c51-2405-4802-8146-8480-ffff-ffff-ffff-fff9.ngrok-free.app/api/v1/results/${filename}`,
+    `https://7a3d-2405-4802-8146-8480-ffff-ffff-ffff-fff9.ngrok-free.app/api/v1/results/${filename}`,
     {
       responseType: "blob",
       headers: {

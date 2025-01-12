@@ -24,9 +24,9 @@ const VideoOption = () => {
       return false;
     }
 
-    const isLt20MB = file.size / 1024 / 1024 < 20;
+    const isLt20MB = file.size / 1024 / 1024 < 40;
     if (!isLt20MB) {
-      message.error("Video must be smaller than 20MB!");
+      message.error("Video must be smaller than 40MB!");
       return false;
     }
 
