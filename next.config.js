@@ -4,6 +4,7 @@ module.exports = {
     ICE_SERVER_URL: process.env.ICE_SERVER_URL,
     ICE_SERVER_USERNAME: process.env.ICE_SERVER_USERNAME,
     ICE_SERVER_CREDENTIAL: process.env.ICE_SERVER_CREDENTIAL,
+    BASE_URL: process.env.BASE_URL,
   },
   webpack(config) {
     const fileLoaderRule = config.module.rules.find((rule) =>

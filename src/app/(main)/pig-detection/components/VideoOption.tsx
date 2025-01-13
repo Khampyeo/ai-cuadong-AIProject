@@ -17,7 +17,7 @@ const VideoOption = () => {
   const [progress, setprogress] = useState<any>(0);
 
   useEffect(() => {
-    const ws = new WebSocket("ws://localhost:3002");
+    const ws = new WebSocket(process.env.BASE_URL + "/ws");
 
     ws.onopen = () => {
       console.log("WebSocket connection established");

@@ -6,7 +6,7 @@ export const processImage = (file: File, userId: string) => {
   formData.append("image", file);
 
   return axios.post(
-    `http://localhost:3001/api/process-image?userId=${userId}`,
+    process.env.BASE_URL + `/api/process-image?userId=${userId}`,
     formData,
     {
       headers: {
@@ -21,7 +21,7 @@ export const processVideo = (file: File, userId: string) => {
   formData.append("video", file);
 
   return axios.post(
-    `http://localhost:3001/api/process-video?userId=${userId}`,
+    process.env.BASE_URL + `/api/process-video?userId=${userId}`,
     formData,
     {
       headers: {
