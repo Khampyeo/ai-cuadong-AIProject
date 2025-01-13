@@ -2,36 +2,35 @@
 import axios from "axios";
 import { fetchApi } from "@/configs/fetchApi";
 
-const URL =
-  "https://7a3d-2405-4802-8146-8480-ffff-ffff-ffff-fff9.ngrok-free.app";
+const URL = "http://localhost:3001";
 
-export const processImage = (file: any) => {
+export const processImage = (file: File, userId: string) => {
   const formData = new FormData();
-  formData.append("file", file);
+  formData.append("image", file);
 
-  return fetchApi.postFormData<{ message: string; data: string }>(
-    URL + "/api/v1/detect/image",
-    formData
-  );
-};
-export const processVideo = (file: any) => {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  return fetchApi.postFormData<{ message: string; data: string }>(
-    URL + "/api/v1/detect/video",
-    formData
-  );
-};
-export const getFile = (filename: string) => {
-  return axios.get(
-    `https://7a3d-2405-4802-8146-8480-ffff-ffff-ffff-fff9.ngrok-free.app/api/v1/results/${filename}`,
+  return axios.post(
+    `http://localhost:3001/api/process-image?userId=${userId}`,
+    formData,
     {
-      responseType: "blob",
       headers: {
-        "User-Agent": "",
-        "ngrok-skip-browser-warning": "69420",
+        "Content-Type": "multipart/form-data",
       },
+      responseType: "blob",
+    }
+  );
+};
+export const processVideo = (file: File, userId: string) => {
+  const formData = new FormData();
+  formData.append("video", file);
+
+  return axios.post(
+    `http://localhost:3001/api/process-video?userId=${userId}`,
+    formData,
+    {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+      responseType: "blob",
     }
   );
 };

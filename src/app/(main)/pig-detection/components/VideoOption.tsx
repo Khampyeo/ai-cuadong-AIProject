@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CaretRightOutlined,
   DownloadOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
-import { Button, Flex, message, Upload } from "antd";
-import { getFile, processVideo } from "@/apis/pig-detection.api";
+import { Button, Flex, message, Progress, Upload } from "antd";
+import { processVideo } from "@/apis/pig-detection.api";
 
 const VideoOption = () => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
@@ -16,6 +16,33 @@ const VideoOption = () => {
     string | null
   >(null);
   const [file, setFile] = useState<File | null>(null);
+  const [progress, setprogress] = useState<any>(0);
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:3002");
+
+    ws.onopen = () => {
+      console.log("WebSocket connection established");
+      const payload = { userId: "user123" };
+      ws.send(JSON.stringify(payload));
+    };
+
+    ws.onmessage = (event) => {
+      setprogress(event.data);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   const beforeUpload = (file: any) => {
     const isVideo = file.type.startsWith("video/");
@@ -43,28 +70,15 @@ const VideoOption = () => {
     };
     reader.readAsDataURL(file);
   };
-  const getVideoProcessed = useMutation({
-    mutationFn: async (name: string) => {
-      return getFile(name);
-    },
-    onSuccess: async (response: any) => {
-      const url = URL.createObjectURL(response.data);
-      setVideoProcessed(url);
-      message.success("Processed video fetched successfully!");
-    },
-    onError: () => {
-      message.error("Can't get the image.");
-    },
-  });
 
   const processVideoMutation = useMutation({
     mutationFn: async (file: File) => {
-      return processVideo(file);
+      return processVideo(file, "user123");
     },
     onSuccess: (response: any) => {
-      setMessageVideoProcessed(response.message);
+      const url = URL.createObjectURL(response.data);
+      setVideoProcessed(url);
       message.success("Image processed successfully!");
-      getVideoProcessed.mutate(response.result_path.replace("results/", ""));
     },
     onError: () => {
       message.error("Failed to process image.");
@@ -114,12 +128,25 @@ const VideoOption = () => {
         </div>
       </div>
       <Flex justify="center" align="center" className="w-full p-5 md:w-32">
+        {processVideoMutation.isPending && (
+          <Progress
+            type="circle"
+            percent={progress}
+            showInfo={false}
+            status="active"
+            strokeColor={{
+              "0%": "#108ee9",
+              "100%": "#87d068",
+            }}
+          />
+        )}
         <Button
           size="large"
           icon={<CaretRightOutlined />}
           onClick={handleProcessVideo}
-          disabled={videoUrl ? false : true}
+          disabled={!videoUrl ? true : false}
           loading={processVideoMutation.isPending}
+          className="!absolute"
         ></Button>
       </Flex>
       <div className="flex-1">

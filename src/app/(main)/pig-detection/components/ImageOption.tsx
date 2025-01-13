@@ -1,13 +1,13 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   CaretRightOutlined,
   DownloadOutlined,
   UploadOutlined,
 } from "@ant-design/icons";
 import { useMutation } from "@tanstack/react-query";
-import { Button, Flex, message, Upload } from "antd";
-import { getFile, processImage } from "@/apis/pig-detection.api";
+import { Button, Flex, message, Progress, Upload } from "antd";
+import { processImage } from "@/apis/pig-detection.api";
 
 const ImageOption = () => {
   const [imageUrl, setImageUrl] = useState<any>(null);
@@ -16,6 +16,33 @@ const ImageOption = () => {
   const [messageImageProcessed, setMessageImageProcessed] = useState<
     string | null
   >(null);
+  const [progress, setprogress] = useState<any>(0);
+
+  useEffect(() => {
+    const ws = new WebSocket("ws://localhost:3002");
+
+    ws.onopen = () => {
+      console.log("WebSocket connection established");
+      const payload = { userId: "user123" };
+      ws.send(JSON.stringify(payload));
+    };
+
+    ws.onmessage = (event) => {
+      setprogress(event.data);
+    };
+
+    ws.onclose = () => {
+      console.log("WebSocket connection closed");
+    };
+
+    ws.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    return () => {
+      ws.close();
+    };
+  }, []);
 
   const beforeUpload = (file: any) => {
     const isImage = file.type.startsWith("image/");
@@ -44,26 +71,15 @@ const ImageOption = () => {
     };
     reader.readAsDataURL(file);
   };
-  const getImageProcessed = useMutation({
-    mutationFn: async (name: string) => {
-      return getFile(name);
-    },
-    onSuccess: async (response: any) => {
-      const url = URL.createObjectURL(response.data);
-      setImageProcessed(url);
-    },
-    onError: () => {
-      message.error("Can't get the image.");
-    },
-  });
+
   const processImageMutation = useMutation({
     mutationFn: async (file: File) => {
-      return processImage(file);
+      return processImage(file, "user123");
     },
     onSuccess: (response: any) => {
       message.success("Image processed successfully!");
-      setMessageImageProcessed(response.message);
-      getImageProcessed.mutate(response.result_path.replace("results/", ""));
+      const url = URL.createObjectURL(response.data);
+      setImageProcessed(url);
     },
     onError: () => {
       message.error("Failed to process image.");
@@ -110,13 +126,30 @@ const ImageOption = () => {
           )}
         </div>
       </div>
-      <Flex justify="center" align="center" className="w-full p-5 md:w-32">
+      <Flex
+        justify="center"
+        align="center"
+        className="relative w-full p-5 md:w-32"
+      >
+        {processImageMutation.isPending && (
+          <Progress
+            type="circle"
+            percent={progress}
+            showInfo={false}
+            status="active"
+            strokeColor={{
+              "0%": "#108ee9",
+              "100%": "#87d068",
+            }}
+          />
+        )}
         <Button
           size="large"
           icon={<CaretRightOutlined />}
           onClick={handleProcessImage}
           disabled={!imageUrl ? true : false}
           loading={processImageMutation.isPending}
+          className="!absolute"
         ></Button>
       </Flex>
       <div className="flex-1">
