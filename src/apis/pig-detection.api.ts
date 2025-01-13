@@ -1,8 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios from "axios";
-import { fetchApi } from "@/configs/fetchApi";
-
-const URL = "http://localhost:3001";
 
 export const processImage = (file: File, userId: string) => {
   const formData = new FormData();

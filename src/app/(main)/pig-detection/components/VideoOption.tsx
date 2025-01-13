@@ -12,9 +12,7 @@ import { processVideo } from "@/apis/pig-detection.api";
 const VideoOption = () => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [videoProcessed, setVideoProcessed] = useState<any>(null);
-  const [messageVideoProcessed, setMessageVideoProcessed] = useState<
-    string | null
-  >(null);
+
   const [file, setFile] = useState<File | null>(null);
   const [progress, setprogress] = useState<any>(0);
 
@@ -164,11 +162,6 @@ const VideoOption = () => {
               controls
               className="max-h-full max-w-full object-contain"
             />
-          )}
-          {messageVideoProcessed && (
-            <p className="text-xl text-green-700 mt-5">
-              {messageVideoProcessed}
-            </p>
           )}
         </div>
       </div>
