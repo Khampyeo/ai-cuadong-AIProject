@@ -1,5 +1,4 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   CaretRightOutlined,
   DownloadOutlined,
@@ -11,38 +10,74 @@ import { processVideo } from "@/apis/pig-detection.api";
 
 const VideoOption = () => {
   const [videoUrl, setVideoUrl] = useState<string | null>(null);
-  const [videoProcessed, setVideoProcessed] = useState<any>(null);
-
+  const [videoProcessed, setVideoProcessed] = useState<string | null>(null);
   const [file, setFile] = useState<File | null>(null);
-  const [progress, setprogress] = useState<any>(0);
+  const [progress, setProgress] = useState<number>(0);
 
-  useEffect(() => {
-    const ws = new WebSocket(process.env.BASE_URL + "/ws");
+  const wsRef = useRef<WebSocket | null>(null);
+  const reconnectAttempts = useRef<number>(0);
+  const maxReconnectAttempts = 5;
+
+  const connectWebSocket = () => {
+    const ws = new WebSocket(`${process.env.BASE_URL}/ws`);
+    wsRef.current = ws;
 
     ws.onopen = () => {
       console.log("WebSocket connection established");
-      const payload = { userId: "user123" };
-      ws.send(JSON.stringify(payload));
+      reconnectAttempts.current = 0; // Reset attempts on successful connection
     };
 
     ws.onmessage = (event) => {
-      setprogress(event.data);
+      try {
+        const data = JSON.parse(event.data);
+        if (data) {
+          setProgress(data);
+        }
+      } catch (e) {
+        console.error("Invalid WebSocket message:", event.data);
+      }
     };
 
     ws.onclose = () => {
       console.log("WebSocket connection closed");
+      attemptReconnect();
     };
 
     ws.onerror = (error) => {
       console.error("WebSocket error:", error);
+      ws.close(); // Ensure connection is closed before retrying
     };
+  };
+
+  const attemptReconnect = () => {
+    if (reconnectAttempts.current < maxReconnectAttempts) {
+      const retryDelay = Math.min(
+        1000 * Math.pow(2, reconnectAttempts.current),
+        30000
+      ); // Exponential backoff
+      reconnectAttempts.current += 1;
+
+      console.log(`Reconnecting in ${retryDelay / 1000} seconds...`);
+      setTimeout(() => {
+        connectWebSocket();
+      }, retryDelay);
+    } else {
+      console.error(
+        "Max reconnect attempts reached. WebSocket connection failed."
+      );
+      message.error("Unable to connect to the server. Please try again later.");
+    }
+  };
+
+  useEffect(() => {
+    connectWebSocket();
 
     return () => {
-      ws.close();
+      wsRef.current?.close();
     };
   }, []);
 
-  const beforeUpload = (file: any) => {
+  const validateFile = (file: File): boolean => {
     const isVideo = file.type.startsWith("video/");
     if (!isVideo) {
       message.error("You can only upload video files!");
@@ -55,12 +90,19 @@ const VideoOption = () => {
       return false;
     }
 
+    return true;
+  };
+
+  const beforeUpload = (file: File) => {
+    if (!validateFile(file)) {
+      return false;
+    }
     setFile(file);
     setVideoUrl(null);
     return true;
   };
 
-  const handleUpload = ({ file }: any) => {
+  const handleUpload = ({ file }: { file: File }) => {
     const reader = new FileReader();
     reader.onload = () => {
       setVideoUrl(reader.result as string);
@@ -70,26 +112,32 @@ const VideoOption = () => {
   };
 
   const processVideoMutation = useMutation({
-    mutationFn: async (file: File) => {
-      return processVideo(file, "user123");
+    mutationFn: async ({ file, userId }: { file: File; userId: string }) => {
+      return processVideo(file, userId);
     },
     onSuccess: (response: any) => {
       const url = URL.createObjectURL(response.data);
       setVideoProcessed(url);
-      message.success("Image processed successfully!");
+      message.success("Video processed successfully!");
+      setProgress(100);
     },
     onError: () => {
-      message.error("Failed to process image.");
+      message.error("Failed to process video.");
     },
   });
 
   const handleProcessVideo = () => {
-    if (file) {
-      processVideoMutation.mutate(file);
+    if (file && wsRef.current?.readyState === WebSocket.OPEN) {
+      const randomId = `id-${Date.now()}-${Math.random().toString(36).substring(2, 15)}`;
+      const payload = { userId: randomId };
+      wsRef.current.send(JSON.stringify(payload));
+
+      processVideoMutation.mutate({ file, userId: randomId });
     } else {
-      message.error("No video selected for processing.");
+      message.error("No video selected or WebSocket not connected.");
     }
   };
+
   const handleDownload = () => {
     if (!videoProcessed) {
       message.error("No processed video to download.");
@@ -98,7 +146,7 @@ const VideoOption = () => {
 
     const link = document.createElement("a");
     link.href = videoProcessed;
-    link.download = "processed-video.mp4"; // Specify the file name and extension
+    link.download = "processed-video.mp4";
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
@@ -111,22 +159,24 @@ const VideoOption = () => {
           accept="video/*"
           showUploadList={false}
           beforeUpload={beforeUpload}
-          customRequest={({ file }) => handleUpload({ file })}
+          customRequest={({ file }: any) => handleUpload({ file })}
         >
           <Button icon={<UploadOutlined />}>Upload Video</Button>
         </Upload>
         <div className="mt-4 p-1 border border-border rounded-md h-96 flex justify-center items-center">
-          {videoUrl && (
+          {videoUrl ? (
             <video
               src={videoUrl}
               controls
               className="max-h-full max-w-full object-contain"
             />
+          ) : (
+            <span>No video uploaded yet</span>
           )}
         </div>
       </div>
       <Flex justify="center" align="center" className="w-full p-5 md:w-32">
-        {processVideoMutation.isPending && (
+        {processVideoMutation.isPending ? (
           <Progress
             type="circle"
             percent={progress}
@@ -137,35 +187,39 @@ const VideoOption = () => {
               "100%": "#87d068",
             }}
           />
+        ) : (
+          <Button
+            size="large"
+            icon={<CaretRightOutlined />}
+            onClick={handleProcessVideo}
+            disabled={!videoUrl}
+            loading={processVideoMutation.isPending}
+            className="!absolute"
+          />
         )}
-        <Button
-          size="large"
-          icon={<CaretRightOutlined />}
-          onClick={handleProcessVideo}
-          disabled={!videoUrl ? true : false}
-          loading={processVideoMutation.isPending}
-          className="!absolute"
-        ></Button>
       </Flex>
       <div className="flex-1">
         <Button
           icon={<DownloadOutlined />}
-          disabled={videoProcessed ? false : true}
+          disabled={!videoProcessed}
           onClick={handleDownload}
         >
           Download
         </Button>
         <div className="flex-1 flex justify-center items-center flex-col mt-4 p-1 border border-border rounded-md h-96">
-          {videoProcessed && (
+          {videoProcessed ? (
             <video
               src={videoProcessed}
               controls
               className="max-h-full max-w-full object-contain"
             />
+          ) : (
+            <span>No processed video yet</span>
           )}
         </div>
       </div>
     </Flex>
   );
 };
+
 export default VideoOption;
