@@ -33,7 +33,7 @@ const VideoOption = () => {
         if (data) {
           setProgress(data);
         }
-      } catch (e) {
+      } catch {
         console.error("Invalid WebSocket message:", event.data);
       }
     };
@@ -115,6 +115,7 @@ const VideoOption = () => {
     mutationFn: async ({ file, userId }: { file: File; userId: string }) => {
       return processVideo(file, userId);
     },
+    /* eslint-disable @typescript-eslint/no-explicit-any */
     onSuccess: (response: any) => {
       const url = URL.createObjectURL(response.data);
       setVideoProcessed(url);
@@ -159,6 +160,7 @@ const VideoOption = () => {
           accept="video/*"
           showUploadList={false}
           beforeUpload={beforeUpload}
+          /* eslint-disable @typescript-eslint/no-explicit-any */
           customRequest={({ file }: any) => handleUpload({ file })}
         >
           <Button icon={<UploadOutlined />}>Upload Video</Button>
